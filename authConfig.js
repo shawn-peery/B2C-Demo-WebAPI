@@ -20,7 +20,7 @@ const passportConfig = {
         loggingNoPII: false,
     },
     protectedRoutes: {
-        microservicesapi: {
+        todolist: {
             endpoint: '/api/todolist',
             delegatedPermissions: {
                 read: ['Todos.Read'],

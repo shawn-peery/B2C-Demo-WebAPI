@@ -21,6 +21,15 @@ exports.getTodo = (req, res, next) => {
 };
 
 exports.getTodos = (req, res, next) => {
+
+    console.log("HIT GET TODOS")
+
+    const owner = req.authInfo['sub'];
+    const todos = db.get('todos').filter({ owner: owner }).value();
+
+    res.status(200).send(todos);
+    return;
+
     if (hasRequiredDelegatedPermissions(req.authInfo, authConfig.protectedRoutes.todolist.delegatedPermissions.read)) {
         try {
             const owner = req.authInfo['sub'];

@@ -40,10 +40,19 @@ const limiter = rateLimit({
 // Apply the rate limiting middleware to all requests
 app.use(limiter);
 
-app.use(cors());
+const corsOptions = {
+    origin: 'http://localhost:3000', // Allow only this origin
+    methods: ['GET', 'POST'], // Allow only these methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allow only these headers
+    exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'], // Expose these headers to the client
+    credentials: true, // Allow credentials
+    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json())
-app.use(express.urlencoded({ extended: false}));
+app.use(express.urlencoded({ extended: false }));
 app.use(morgan('dev'));
 
 const options = {
@@ -58,7 +67,7 @@ const options = {
     loggingNoPII: authConfig.settings.loggingNoPII, // set this to true in the authConfig.js if you want to enable logging and debugging
 };
 
-const bearerStrategy = new passportAzureAd.BearerStrategy(options, (req,token, done) => {
+const bearerStrategy = new passportAzureAd.BearerStrategy(options, (req, token, done) => {
     /**
      * Below you can do extended token validation and check for additional claims, such as:
      * - check if the delegated permissions in the 'scp' are the same as the ones declared in the application registration.
@@ -83,6 +92,7 @@ const bearerStrategy = new passportAzureAd.BearerStrategy(options, (req,token, d
     /**
      * Access tokens that have no 'scp' (for delegated permissions).
      */
+    console.log("Checking for scp");
     if (!token.hasOwnProperty('scp')) {
         return done(new Error('Unauthorized'), null, 'No delegated permissions found');
     }
